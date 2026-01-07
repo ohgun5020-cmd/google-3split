@@ -1,9 +1,27 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Step1 } from "./components/Step1";
+import { Step1, Step1Output } from "./components/Step1";
+import { Step2, Step2Output } from "./components/Step2";
+import { Step3 } from "./components/Step3";
 
 const App = () => {
   const [activeStep, setActiveStep] = useState(1);
+  const [step1Data, setStep1Data] = useState<Step1Output | null>(null);
+  const [step2Data, setStep2Data] = useState<Step2Output | null>(null);
+
+  const handleStep1Success = (data: Step1Output, shouldNavigate: boolean = false) => {
+    setStep1Data(data);
+    if (shouldNavigate) {
+      setActiveStep(2);
+    }
+  };
+
+  const handleStep2Success = (data: Step2Output, shouldNavigate: boolean = false) => {
+    setStep2Data(data);
+    if (shouldNavigate) {
+      setActiveStep(3);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F9FAFB]">
@@ -20,7 +38,7 @@ const App = () => {
             </div>
           </div>
           <div className="flex items-center gap-4">
-             <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-semibold uppercase tracking-wider">v1.0.0</span>
+             <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-semibold uppercase tracking-wider">v1.1.0</span>
           </div>
         </div>
       </header>
@@ -30,8 +48,8 @@ const App = () => {
         <nav className="flex space-x-2 bg-white p-1.5 rounded-full shadow-sm border border-gray-100 w-fit">
           {[
             { id: 1, label: "1단계: 캐릭터 설정", icon: "fa-user" },
-            { id: 2, label: "2단계: 인테리어 (준비 중)", icon: "fa-couch" },
-            { id: 3, label: "3단계: 합성 (준비 중)", icon: "fa-magic" }
+            { id: 2, label: "2단계: 배경 및 사물", icon: "fa-couch" },
+            { id: 3, label: "3단계: 합성 및 완성", icon: "fa-magic" }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -51,23 +69,20 @@ const App = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-[1600px] mx-auto w-full px-8 pb-12">
-        {activeStep === 1 && <Step1 />}
-        {activeStep === 2 && (
-          <div className="h-[60vh] flex flex-col items-center justify-center text-gray-400 bg-white rounded-3xl border border-gray-100 shadow-sm">
-             <div className="bg-gray-50 p-6 rounded-full mb-6">
-                <i className="fas fa-couch text-4xl text-gray-300"></i>
-             </div>
-             <p className="text-lg font-medium text-gray-500">2단계: 인테리어 생성기는 현재 개발 중입니다.</p>
-          </div>
-        )}
-        {activeStep === 3 && (
-           <div className="h-[60vh] flex flex-col items-center justify-center text-gray-400 bg-white rounded-3xl border border-gray-100 shadow-sm">
-             <div className="bg-gray-50 p-6 rounded-full mb-6">
-                <i className="fas fa-puzzle-piece text-4xl text-gray-300"></i>
-             </div>
-             <p className="text-lg font-medium text-gray-500">3단계: 합성 엔진은 현재 개발 중입니다.</p>
-           </div>
-        )}
+        {/* Step 1: Keep mounted to preserve state */}
+        <div className={activeStep === 1 ? "block h-full" : "hidden"}>
+          <Step1 onDataGenerated={handleStep1Success} />
+        </div>
+
+        {/* Step 2: Keep mounted to preserve state */}
+        <div className={activeStep === 2 ? "block h-full" : "hidden"}>
+          <Step2 step1Data={step1Data} onDataGenerated={handleStep2Success} />
+        </div>
+
+        {/* Step 3: Keep mounted to preserve state */}
+        <div className={activeStep === 3 ? "block h-full" : "hidden"}>
+           <Step3 step1Data={step1Data} step2Data={step2Data} />
+        </div>
       </main>
     </div>
   );

@@ -4,14 +4,16 @@ interface MarkdownCardProps {
   title: string;
   content: string;
   type?: "prompt" | "negative" | "json";
+  onCopy?: () => void;
 }
 
-export const MarkdownCard: React.FC<MarkdownCardProps> = ({ title, content, type = "prompt" }) => {
+export const MarkdownCard: React.FC<MarkdownCardProps> = ({ title, content, type = "prompt", onCopy }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(content);
     setCopied(true);
+    if (onCopy) onCopy();
     setTimeout(() => setCopied(false), 2000);
   };
 
